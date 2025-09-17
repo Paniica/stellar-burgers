@@ -1,5 +1,5 @@
-import { TOrder } from '@utils-types';
+import { OrderData } from '@utils-types';
 
 export type OrderCardProps = {
-  order: TOrder;
+  order: OrderData;
 };

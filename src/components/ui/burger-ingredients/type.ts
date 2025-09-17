@@ -1,11 +1,11 @@
 import { RefObject } from 'react';
-import { TIngredient, TTabMode } from '@utils-types';
+import { BurgerIngredient, IngredientCategory } from '@utils-types';
 
 export type BurgerIngredientsUIProps = {
-  currentTab: TTabMode;
-  buns: TIngredient[];
-  mains: TIngredient[];
-  sauces: TIngredient[];
+  currentTab: IngredientCategory;
+  buns: BurgerIngredient[];
+  mains: BurgerIngredient[];
+  sauces: BurgerIngredient[];
   titleBunRef: RefObject<HTMLHeadingElement>;
   titleMainRef: RefObject<HTMLHeadingElement>;
   titleSaucesRef: RefObject<HTMLHeadingElement>;
