@@ -1,6 +1,6 @@
-import { TOrder } from '@utils-types';
+import { OrderData } from '@utils-types';
 
 export type FeedUIProps = {
-  orders: TOrder[];
+  orders: OrderData[];
   handleGetFeeds: () => void;
 };

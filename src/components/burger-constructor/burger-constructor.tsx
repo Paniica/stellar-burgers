@@ -1,45 +1,81 @@
 import { FC, useMemo } from 'react';
-import { TConstructorIngredient } from '@utils-types';
+import { ConstructorItem } from '@utils-types';
 import { BurgerConstructorUI } from '@ui';
+import { useDispatch, useSelector } from '../../services/store';
+import { selectConstructorItems } from '@selectors/constructor';
+import { selectOrderRequest, selectOrderData } from '@selectors/order';
+import { resetConstructor } from '@slices/constructor';
+import { submitOrder, resetOrder } from '@slices/order';
+import { selectUser } from '@selectors/user';
+import { useNavigate } from 'react-router-dom';
 
+/**
+ * Компонент конструктора бургера - сердце приложения Stellar Burgers
+ *
+ * Основные функции:
+ * - Отображение текущего состояния конструктора (булка + начинки)
+ * - Расчет общей стоимости заказа с учетом удвоенной цены булки
+ * - Обработка создания заказа с проверкой авторизации
+ * - Управление модальными окнами для подтверждения заказа
+ *
+ * Бизнес-логика:
+ * - Булка учитывается дважды в цене (верх + низ)
+ * - Заказ можно создать только авторизованному пользователю
+ * - После успешного заказа конструктор очищается
+ * - Предотвращение повторных заказов во время обработки
+ */
 export const BurgerConstructor: FC = () => {
-  /** TODO: взять переменные constructorItems, orderRequest и orderModalData из стора */
-  const constructorItems = {
-    bun: {
-      price: 0
-    },
-    ingredients: []
-  };
+  // Получаем необходимые данные из Redux store
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const constructorItems = useSelector(selectConstructorItems);
+  const orderRequest = useSelector(selectOrderRequest);
+  const orderModalData = useSelector(selectOrderData);
+  const user = useSelector(selectUser);
 
-  const orderRequest = false;
-
-  const orderModalData = null;
-
-  const onOrderClick = () => {
+  const handleOrderSubmit = () => {
+    // Проверяем авторизацию пользователя
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    // Проверяем наличие булки и отсутствие активного запроса
     if (!constructorItems.bun || orderRequest) return;
+    // Формируем массив ID ингредиентов для заказа
+    const ingredientIds: string[] = [
+      constructorItems.bun._id,
+      ...constructorItems.ingredients.map((item) => item._id),
+      constructorItems.bun._id
+    ];
+    dispatch(submitOrder(ingredientIds));
   };
-  const closeOrderModal = () => {};
 
-  const price = useMemo(
+  const handleOrderModalClose = () => {
+    // Очищаем конструктор после успешного заказа
+    if (orderModalData) {
+      dispatch(resetConstructor());
+      dispatch(resetOrder());
+    }
+  };
+
+  const totalPrice = useMemo(
     () =>
       (constructorItems.bun ? constructorItems.bun.price * 2 : 0) +
       constructorItems.ingredients.reduce(
-        (s: number, v: TConstructorIngredient) => s + v.price,
+        (sum: number, item: ConstructorItem) => sum + item.price,
         0
       ),
     [constructorItems]
   );
 
-  return null;
-
   return (
     <BurgerConstructorUI
-      price={price}
+      price={totalPrice}
       orderRequest={orderRequest}
       constructorItems={constructorItems}
       orderModalData={orderModalData}
-      onOrderClick={onOrderClick}
-      closeOrderModal={closeOrderModal}
+      onOrderClick={handleOrderSubmit}
+      closeOrderModal={handleOrderModalClose}
     />
   );
 };
