@@ -55,8 +55,14 @@ Cypress.Commands.add('mockApiRequests', () => {
   
   // Перехватываем запрос на создание заказа
   cy.intercept('POST', '**/api/orders', { fixture: 'order.json' }).as('createOrder');
+  
+  // Скрываем webpack-dev-server overlay
+  cy.window().then((win) => {
+    const overlay = win.document.getElementById('webpack-dev-server-client-overlay');
+    if (overlay) {
+      overlay.style.display = 'none';
+      overlay.style.visibility = 'hidden';
+      overlay.style.zIndex = '-1';
+    }
+  });
 });
-
-
-
-
