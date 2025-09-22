@@ -1,6 +1,6 @@
-import { TIngredient } from '@utils-types';
+import { BurgerIngredient } from '@utils-types';
 
 export type TBurgerIngredientProps = {
-  ingredient: TIngredient;
+  ingredient: BurgerIngredient;
   count: number;
 };

@@ -1,8 +1,8 @@
 import { Location } from 'react-router-dom';
-import { TIngredient } from '@utils-types';
+import { BurgerIngredient } from '@utils-types';
 
 export type TBurgerIngredientUIProps = {
-  ingredient: TIngredient;
+  ingredient: BurgerIngredient;
   count: number;
   locationState: { background: Location };
   handleAdd: () => void;

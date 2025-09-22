@@ -1,5 +1,5 @@
-import { TOrder } from '@utils-types';
+import { OrderData } from '@utils-types';
 
 export type ProfileOrdersUIProps = {
-  orders: TOrder[];
+  orders: OrderData[];
 };

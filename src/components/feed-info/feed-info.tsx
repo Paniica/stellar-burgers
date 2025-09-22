@@ -1,18 +1,20 @@
 import { FC } from 'react';
 
-import { TOrder } from '@utils-types';
+import { OrderData } from '@utils-types';
 import { FeedInfoUI } from '../ui/feed-info';
+import { useSelector } from '../../services/store';
+import { selectFeed } from '@selectors/feeds';
 
-const getOrders = (orders: TOrder[], status: string): number[] =>
+const getOrders = (orders: OrderData[], status: string): number[] =>
   orders
     .filter((item) => item.status === status)
     .map((item) => item.number)
     .slice(0, 20);
 
 export const FeedInfo: FC = () => {
-  /** TODO: взять переменные из стора */
-  const orders: TOrder[] = [];
-  const feed = {};
+  // Достаю из стора агрегированные данные ленты и беру список заказов
+  const feed = useSelector(selectFeed);
+  const orders: OrderData[] = feed?.orders || [];
 
   const readyOrders = getOrders(orders, 'done');
 
@@ -22,7 +24,7 @@ export const FeedInfo: FC = () => {
     <FeedInfoUI
       readyOrders={readyOrders}
       pendingOrders={pendingOrders}
-      feed={feed}
+      feed={feed || { orders: [], total: 0, totalToday: 0 }}
     />
   );
 };

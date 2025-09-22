@@ -1,8 +1,35 @@
 import { setCookie, getCookie } from './cookie';
-import { TIngredient, TOrder, TOrdersData, TUser } from './types';
+import {
+  BurgerIngredient,
+  OrderData,
+  OrdersResponse,
+  UserProfile
+} from './types';
+
+/**
+ * API клиент для работы с бэкендом Stellar Burgers
+ *
+ * Этот модуль содержит все необходимые функции для взаимодействия с API:
+ * - Аутентификация пользователей (регистрация, вход, выход)
+ * - Управление токенами доступа с автоматическим обновлением
+ * - Работа с ингредиентами и заказами
+ * - Обработка ошибок и повторных запросов
+ *
+ * Особенности реализации:
+ * - Автоматическое обновление access token при истечении
+ * - Безопасное хранение refresh token в localStorage
+ * - Типизированные ответы для всех API методов
+ * - Централизованная обработка ошибок
+ */
 
 const URL = process.env.BURGER_API_URL;
 
+/**
+ * Универсальная функция проверки ответа от сервера
+ *
+ * Проверяет статус ответа и возвращает JSON данные или отклоняет Promise
+ * с детальной информацией об ошибке для отладки
+ */
 const checkResponse = <T>(res: Response): Promise<T> =>
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
 
@@ -58,17 +85,17 @@ export const fetchWithRefresh = async <T>(
 };
 
 type TIngredientsResponse = TServerResponse<{
-  data: TIngredient[];
+  data: BurgerIngredient[];
 }>;
 
 type TFeedsResponse = TServerResponse<{
-  orders: TOrder[];
+  orders: OrderData[];
   total: number;
   totalToday: number;
 }>;
 
 type TOrdersResponse = TServerResponse<{
-  data: TOrder[];
+  data: OrderData[];
 }>;
 
 export const getIngredientsApi = () =>
@@ -100,7 +127,7 @@ export const getOrdersApi = () =>
   });
 
 type TNewOrderResponse = TServerResponse<{
-  order: TOrder;
+  order: OrderData;
   name: string;
 }>;
 
@@ -120,7 +147,7 @@ export const orderBurgerApi = (data: string[]) =>
   });
 
 type TOrderResponse = TServerResponse<{
-  orders: TOrder[];
+  orders: OrderData[];
 }>;
 
 export const getOrderByNumberApi = (number: number) =>
@@ -140,7 +167,7 @@ export type TRegisterData = {
 type TAuthResponse = TServerResponse<{
   refreshToken: string;
   accessToken: string;
-  user: TUser;
+  user: UserProfile;
 }>;
 
 export const registerUserApi = (data: TRegisterData) =>
@@ -204,7 +231,7 @@ export const resetPasswordApi = (data: { password: string; token: string }) =>
       return Promise.reject(data);
     });
 
-type TUserResponse = TServerResponse<{ user: TUser }>;
+type TUserResponse = TServerResponse<{ user: UserProfile }>;
 
 export const getUserApi = () =>
   fetchWithRefresh<TUserResponse>(`${URL}/auth/user`, {
